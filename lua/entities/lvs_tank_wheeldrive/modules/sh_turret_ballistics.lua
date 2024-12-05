@@ -86,7 +86,7 @@ if SERVER then
 
 		local pod = weapon:GetDriverSeat()
 
-		if IsValid( pod ) then
+		--[[if IsValid( pod ) then
 			local ply = weapon:GetDriver()
 
 			if IsValid( ply ) and ply ~= weapon._LastBallisticsSendTo then
@@ -102,7 +102,7 @@ if SERVER then
 			if pod:GetThirdPersonMode() then
 				return self:WorldToLocalAngles( weapon:GetAimVector():Angle() )
 			end
-		end
+		end]]
 
 		local ID = self:LookupAttachment( EntTable.TurretBallisticsMuzzleAttachment )
 
@@ -118,16 +118,16 @@ if SERVER then
 
 		local StartPos = MuzzlePos
 
-		local ProjectileVelocity = EntTable.TurretBallisticsProjectileVelocity
+		--local ProjectileVelocity = EntTable.TurretBallisticsProjectileVelocity
 		local Dist = (AimPos - MuzzlePos):Length()
 
 		local OffsetPredicted = vector_origin
 
-		if EntTable.TurretBallisticsPredicted then
+		--[[if EntTable.TurretBallisticsPredicted then
 			OffsetPredicted = physenv.GetGravity() * ((Dist / ProjectileVelocity) ^ 2)
-		end
+		end]]
 
-		local EndPos = AimPos - OffsetPredicted
+		local EndPos = AimPos --- OffsetPredicted
 
 		local Dir = (EndPos - StartPos):GetNormalized()
 
@@ -136,9 +136,9 @@ if SERVER then
 		-- more body pitch/roll = more inaccurate. If Z up get smaller, turret must align more conservative to not overshoot
 		local TurretSmoothing = math.abs( UpZ )
 
-		self:SetTurretCompensation( OffsetPredicted.z )
+		--self:SetTurretCompensation( OffsetPredicted.z )
 
-		return Angle( self:GetTurretPitch() + Ang.p * TurretSmoothing, self:GetTurretYaw() + Ang.y * TurretSmoothing, 0 )
+		return Angle( self:GetTurretPitch() + Ang.p , self:GetTurretYaw() + Ang.y , 0 )
 	end
 
 else
@@ -155,10 +155,10 @@ else
 		if muzzle == "" then muzzle = nil end
 		if sight == "" then sight = nil end
 
-		vehicle:TurretUpdateBallistics( velocity, muzzle, sight )
+		--vehicle:TurretUpdateBallistics( velocity, muzzle, sight )
 	end )
 
-	function ENT:CalcOpticsCrosshairDot( Pos2D )
+	--[[function ENT:CalcOpticsCrosshairDot( Pos2D )
 		local ID = self:LookupAttachment( self.TurretBallisticsMuzzleAttachment )
 
 		local Muzzle = self:GetAttachment( ID )
@@ -207,10 +207,10 @@ else
 		cam.End3D()
 
 		self:PaintOpticsCrosshair( Pos:ToScreen() )
-	end
+	end]]
 end
 
-function ENT:TurretUpdateBallistics( newvelocity, newmuzzle, newsight )
+--[[function ENT:TurretUpdateBallistics( newvelocity, newmuzzle, newsight )
 	if newvelocity then
 		self.TurretBallisticsProjectileVelocity = newvelocity
 	end
@@ -235,7 +235,7 @@ function ENT:TurretUpdateBallistics( newvelocity, newmuzzle, newsight )
 		net.WriteString( newmuzzle or "" )
 		net.WriteString( newsight or "" )
 	net.Send( ply )
-end
+end]]
 
 function ENT:AimTurret()
 	if not self:IsTurretEnabled() then if SERVER then self:StopTurretSound() self:StopTurretSoundDMG() end return end

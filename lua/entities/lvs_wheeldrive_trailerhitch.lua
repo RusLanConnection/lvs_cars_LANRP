@@ -45,7 +45,7 @@ if SERVER then
 
 		local base = self:GetBase()
 
-		if not IsValid( ply ) or not ply:Alive() or ply:InVehicle() or ply:GetObserverMode() ~= OBS_MODE_NONE or not ply:KeyDown( IN_WALK ) or (ply:GetShootPos() - self:GetPos()):Length() > GrabDistance or not IsValid( base ) then return end
+		if not IsValid( ply ) or not ply:Alive() or ply:InVehicle() or ply:GetObserverMode() ~= OBS_MODE_NONE or not ply:KeyDown( IN_WALK ) or (ply:GetShootPos() - self:GetPos()):Length() > GrabDistance or not IsValid( base ) or IsValid(base:GetDriver()) then return end
 
 		ply:SprintDisable()
 
@@ -81,17 +81,17 @@ if SERVER then
 		base:OnStartDrag( self, ply )
 		base._HandBrakeForceDisabled = true
 
-		base._DragOriginalCollisionGroup = base:GetCollisionGroup()
-		base:SetCollisionGroup( COLLISION_GROUP_WORLD )
+		--base._DragOriginalCollisionGroup = base:GetCollisionGroup()
+		--base:SetCollisionGroup( COLLISION_GROUP_WORLD )
 
-		if base.GetWheels then
+		--[[if base.GetWheels then
 			for _, wheel in pairs( base:GetWheels() ) do
 				if not IsValid( wheel ) then continue end
 
 				wheel._DragOriginalCollisionGroup = wheel:GetCollisionGroup()
 				wheel:SetCollisionGroup( COLLISION_GROUP_WORLD )
 			end
-		end
+		end]]
 
 		self:NextThink( CurTime() )
 	end
@@ -116,7 +116,7 @@ if SERVER then
 
 			if IsValid( ply ) then base:SetPhysicsAttacker( ply ) end
 	
-			if base._DragOriginalCollisionGroup then
+			--[[if base._DragOriginalCollisionGroup then
 				base:SetCollisionGroup( base._DragOriginalCollisionGroup )
 				base._DragOriginalCollisionGroup = nil
 			end
@@ -132,7 +132,7 @@ if SERVER then
 						wheel._DragOriginalCollisionGroup = nil
 					end
 				end
-			end
+			end]]
 		end
 
 		self:SetDragTarget( NULL )
@@ -151,7 +151,9 @@ if SERVER then
 	end
 
 	function ENT:Drag( ply )
-		if not IsValid( self.GrabEnt ) or ply:InVehicle() or not ply:KeyDown( IN_WALK ) or not ply:Alive() or ply:GetObserverMode() ~= OBS_MODE_NONE then
+		local base = self:GetBase()
+		
+		if not IsValid( self.GrabEnt ) or ply:InVehicle() or not ply:KeyDown( IN_WALK ) or not ply:Alive() or ply:GetObserverMode() ~= OBS_MODE_NONE or IsValid(base:GetDriver()) then
 			self:StopDrag()
 
 			return
@@ -174,8 +176,6 @@ if SERVER then
 		if (self:GetPos() - TargetPos):Length() > GrabDistance then self:StopDrag() return end
 
 		self.GrabEnt:SetPos( TargetPos )
-
-		local base = self:GetBase()
 
 		if not IsValid( base ) then return end
 

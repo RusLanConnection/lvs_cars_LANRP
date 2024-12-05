@@ -91,6 +91,10 @@ function ENT:LVSHudPaintInfoText( X, Y, W, H, ScrX, ScrY, ply )
 	draw.DrawText( "km/h ", "LVS_FONT", X + 72, Y + 35, color_white, TEXT_ALIGN_RIGHT )
 	draw.DrawText( kmh, "LVS_FONT_HUD_LARGE", X + 72, Y + 20, color_white, TEXT_ALIGN_LEFT )
 
+	local fuel = math.Round(self:GetFuelTank():GetFuel(),0)
+	draw.DrawText( "Fuel ", "LVS_FONT", X - 70, Y + 35, color_white, TEXT_ALIGN_RIGHT )
+	draw.DrawText( fuel, "LVS_FONT_HUD_LARGE", X - 70, Y + 20, color_white, TEXT_ALIGN_LEFT )
+
 	if ply ~= self:GetDriver() then return end
 
 	local Throttle = self:GetThrottle()

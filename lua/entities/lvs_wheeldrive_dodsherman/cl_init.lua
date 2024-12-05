@@ -8,7 +8,7 @@ local switch = Material("lvs/weapons/change_ammo.png")
 local AP = Material("lvs/weapons/bullet_ap.png")
 local HE = Material("lvs/weapons/tank_cannon.png")
 function ENT:DrawWeaponIcon( PodID, ID, x, y, width, height, IsSelected, IconColor )
-	local Icon = self:GetUseHighExplosive() and HE or AP
+	local Icon = --[[self:GetUseHighExplosive() and HE or]] AP
 
 	surface.SetMaterial( Icon )
 	surface.DrawTexturedRect( x, y, width, height )
@@ -17,7 +17,7 @@ function ENT:DrawWeaponIcon( PodID, ID, x, y, width, height, IsSelected, IconCol
 
 	if not IsValid( ply ) or self:GetSelectedWeapon() ~= 2 then return end
 
-	surface.SetMaterial( switch )
+	--[[surface.SetMaterial( switch )
 	surface.DrawTexturedRect( x + width + 5, y + 7, 24, 24 )
 
 	local buttonCode = ply:lvsGetControls()[ "CAR_SWAP_AMMO" ]
@@ -28,7 +28,7 @@ function ENT:DrawWeaponIcon( PodID, ID, x, y, width, height, IsSelected, IconCol
 
 	if not KeyName then return end
 
-	draw.DrawText( KeyName, "DermaDefault", x + width + 17, y + height * 0.5 + 7, Color(0,0,0,IconColor.a), TEXT_ALIGN_CENTER )
+	draw.DrawText( KeyName, "DermaDefault", x + width + 17, y + height * 0.5 + 7, Color(0,0,0,IconColor.a), TEXT_ALIGN_CENTER )]]
 end
 
 function ENT:OnEngineActiveChanged( Active )

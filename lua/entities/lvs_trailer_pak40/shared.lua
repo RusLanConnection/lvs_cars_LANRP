@@ -20,10 +20,6 @@ ENT.WheelPhysicsInertia = Vector(10,8,10)
 
 ENT.CannonArmorPenetration = 14500
 
--- ballistics
-ENT.ProjectileVelocityHighExplosive = 13000
-ENT.ProjectileVelocityArmorPiercing = 16000
-
 ENT.lvsShowInSpawner = false
 
 ENT.MaxHealth = 800
@@ -92,12 +88,6 @@ function ENT:InitWeapons()
 				ent:DoReloadSequence( 0 )
 				ent:SetHeat( 1 )
 				ent:SetOverheated( true )
-
-				if ent:GetUseHighExplosive() then
-					ent:TurretUpdateBallistics( ent.ProjectileVelocityHighExplosive )
-				else
-					ent:TurretUpdateBallistics( ent.ProjectileVelocityArmorPiercing )
-				end
 			end
 		end
 	end
@@ -112,7 +102,6 @@ function ENT:InitWeapons()
 		bullet.Src 	= Muzzle.Pos
 		bullet.Dir 	= Muzzle.Ang:Forward()
 		bullet.Spread = Vector(0,0,0)
-		bullet.EnableBallistics = true
 
 		if ent:GetUseHighExplosive() then
 			bullet.Force	= 500
@@ -122,12 +111,12 @@ function ENT:InitWeapons()
 			bullet.SplashDamageRadius = 200
 			bullet.SplashDamageEffect = "lvs_bullet_impact_explosive"
 			bullet.SplashDamageType = DMG_BLAST
-			bullet.Velocity = ent.ProjectileVelocityHighExplosive
+			bullet.Velocity = 13000
 		else
 			bullet.Force	= ent.CannonArmorPenetration
 			bullet.HullSize 	= 0
 			bullet.Damage	= 1000
-			bullet.Velocity = ent.ProjectileVelocityArmorPiercing
+			bullet.Velocity = 16000
 		end
 
 		bullet.TracerName = "lvs_tracer_cannon"

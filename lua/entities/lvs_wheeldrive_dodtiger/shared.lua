@@ -23,20 +23,15 @@ ENT.GibModels = {
 
 ENT.AITEAM = 1
 
-ENT.MaxHealth = 1500
+ENT.MaxHealth = 1200
 
 --damage system
-ENT.DSArmorIgnoreForce = 4000
-ENT.CannonArmorPenetration = 14500
-ENT.FrontArmor = 6000
-ENT.SideArmor = 4000
-ENT.TurretArmor = 6000
-ENT.RearArmor = 4000
-
--- ballistics
-ENT.ProjectileVelocityCoaxial = 15000
-ENT.ProjectileVelocityHighExplosive = 13000
-ENT.ProjectileVelocityArmorPiercing = 16000
+ENT.DSArmorIgnoreForce = 2000
+ENT.CannonArmorPenetration = 2400
+ENT.FrontArmor = 200
+--ENT.SideArmor = 4000
+ENT.TurretArmor = 399
+--ENT.RearArmor = 4000
 
 ENT.SteerSpeed = 1
 ENT.SteerReturnSpeed = 2
@@ -45,7 +40,7 @@ ENT.PhysicsWeightScale = 2
 ENT.PhysicsDampingSpeed = 1000
 ENT.PhysicsInertia = Vector(6000,6000,1500)
 
-ENT.MaxVelocity = 450
+ENT.MaxVelocity = 150
 ENT.MaxVelocityReverse = 150
 
 ENT.EngineCurve = 0.1
@@ -54,10 +49,10 @@ ENT.EngineTorque = 200
 ENT.TransMinGearHoldTime = 0.1
 ENT.TransShiftSpeed = 0
 
-ENT.TransGears = 3
-ENT.TransGearsReverse = 1
+ENT.TransGears = 15
+ENT.TransGearsReverse = 15
 
-ENT.MouseSteerAngle = 45
+ENT.MouseSteerAngle = 20
 
 ENT.lvsShowInSpawner = true
 
@@ -102,7 +97,7 @@ function ENT:InitWeapons()
 
 	local weapon = {}
 	weapon.Icon = Material("lvs/weapons/mg.png")
-	weapon.Ammo = 1000
+	weapon.Ammo = 250
 	weapon.Delay = 0.1
 	weapon.HeatRateUp = 0.2
 	weapon.HeatRateDown = 0.25
@@ -116,13 +111,12 @@ function ENT:InitWeapons()
 		local bullet = {}
 		bullet.Src 	= Muzzle.Pos
 		bullet.Dir 	= Muzzle.Ang:Forward()
-		bullet.Spread = Vector(0.01,0.01,0.01)
+		bullet.Spread 	= Vector(0.015,0.015,0.015)
 		bullet.TracerName = "lvs_tracer_yellow_small"
-		bullet.Force	= 10
-		bullet.EnableBallistics = true
+		bullet.Force	= 1
 		bullet.HullSize 	= 0
 		bullet.Damage	= 25
-		bullet.Velocity = ent.ProjectileVelocityCoaxial
+		bullet.Velocity = 8000
 		bullet.Attacker 	= ent:GetDriver()
 		ent:LVSFireBullet( bullet )
 
@@ -163,9 +157,6 @@ function ENT:InitWeapons()
 			ent:LVSPaintHitMarker( MuzzlePos2D )
 		end
 	end
-	weapon.OnSelect = function( ent )
-		ent:TurretUpdateBallistics( ent.ProjectileVelocityCoaxial, "muzzle_coax" )
-	end
 	self:AddWeapon( weapon )
 
 
@@ -175,7 +166,7 @@ function ENT:InitWeapons()
 	weapon.Delay = 3.3
 	weapon.HeatRateUp = 1
 	weapon.HeatRateDown = 0.22
-	weapon.OnThink = function( ent )
+	--[[weapon.OnThink = function( ent )
 		if ent:GetSelectedWeapon() ~= 2 then return end
 
 		local ply = ent:GetDriver()
@@ -192,15 +183,9 @@ function ENT:InitWeapons()
 				ent:EmitSound("lvs/vehicles/tiger/cannon_unload.wav", 75, 100, 1, CHAN_WEAPON )
 				ent:SetHeat( 1 )
 				ent:SetOverheated( true )
-
-				if ent:GetUseHighExplosive() then
-					ent:TurretUpdateBallistics( ent.ProjectileVelocityHighExplosive )
-				else
-					ent:TurretUpdateBallistics( ent.ProjectileVelocityArmorPiercing )
-				end
 			end
 		end
-	end
+	end]]
 	weapon.Attack = function( ent )
 		local ID = ent:LookupAttachment( "muzzle" )
 
@@ -212,23 +197,22 @@ function ENT:InitWeapons()
 		bullet.Src 	= Muzzle.Pos
 		bullet.Dir 	= Muzzle.Ang:Forward()
 		bullet.Spread = Vector(0,0,0)
-		bullet.EnableBallistics = true
 
-		if ent:GetUseHighExplosive() then
-			bullet.Force	= 500
+		--if ent:GetUseHighExplosive() then
+			bullet.Force	= self.CannonArmorPenetration --500
 			bullet.HullSize 	= 15
-			bullet.Damage	= 250
-			bullet.SplashDamage = 1000
-			bullet.SplashDamageRadius = 250
+			bullet.Damage	= 600
+			bullet.SplashDamage = 150
+			bullet.SplashDamageRadius = 458
 			bullet.SplashDamageEffect = "lvs_bullet_impact_explosive"
-			bullet.SplashDamageType = DMG_BLAST
-			bullet.Velocity = ent.ProjectileVelocityHighExplosive
-		else
+			bullet.SplashDamageType = DMG_SONIC
+			bullet.Velocity = 13000
+		--[[else
 			bullet.Force	= ent.CannonArmorPenetration
 			bullet.HullSize 	= 0
 			bullet.Damage	= 1250
-			bullet.Velocity = ent.ProjectileVelocityArmorPiercing
-		end
+			bullet.Velocity = 16000
+		end]]
 
 		bullet.TracerName = "lvs_tracer_cannon"
 		bullet.Attacker 	= ent:GetDriver()
@@ -269,20 +253,13 @@ function ENT:InitWeapons()
 
 			local MuzzlePos2D = traceTurret.HitPos:ToScreen() 
 
-			if ent:GetUseHighExplosive() then
-				ent:PaintCrosshairSquare( MuzzlePos2D, COLOR_WHITE )
-			else
+			--if ent:GetUseHighExplosive() then
+				--ent:PaintCrosshairSquare( MuzzlePos2D, COLOR_WHITE )
+			--else
 				ent:PaintCrosshairOuter( MuzzlePos2D, COLOR_WHITE )
-			end
+			--end
 
 			ent:LVSPaintHitMarker( MuzzlePos2D )
-		end
-	end
-	weapon.OnSelect = function( ent )
-		if ent:GetUseHighExplosive() then
-			ent:TurretUpdateBallistics( ent.ProjectileVelocityHighExplosive, "muzzle" )
-		else
-			ent:TurretUpdateBallistics( ent.ProjectileVelocityArmorPiercing, "muzzle" )
 		end
 	end
 	self:AddWeapon( weapon )
@@ -351,10 +328,10 @@ function ENT:InitWeapons()
 
 	local weapon = {}
 	weapon.Icon = Material("lvs/weapons/grenade_launcher.png")
-	weapon.Ammo = 1
-	weapon.Delay = 1
+	weapon.Ammo = 3
+	weapon.Delay = 10
 	weapon.HeatRateUp = 1
-	weapon.HeatRateDown = 1
+	weapon.HeatRateDown = 0.1
 	weapon.Attack = function( ent )
 		ent:TakeAmmo( 1 )
 
@@ -386,13 +363,19 @@ function ENT:InitWeapons()
 				local pos = ent:LocalToWorld( data.pos ) 
 				local ang = ent:LocalToWorldAngles( data.ang )
 		
-				local grenade = ents.Create( "lvs_item_explosive" )
+				local grenade = ents.Create( "ent_jack_gmod_ezboundingmine" )
 				grenade:SetPos( pos )
 				grenade:SetAngles( ang )
 				grenade:Spawn()
 				grenade:Activate()
-				grenade:SetAttacker( ent:GetDriver() )
-				grenade:GetPhysicsObject():SetVelocity( ang:Forward() * 300 )
+				--grenade:SetAttacker( ent:GetDriver() )
+				grenade:GetPhysicsObject():SetVelocity( ang:Forward() * 400 )
+
+				timer.Simple(2, function()
+					if IsValid(grenade) then
+						grenade:Bury(ent:GetDriver())
+					end
+				end)
 			end )
 		end
 	end
@@ -430,7 +413,7 @@ function ENT:AddGunnerWeapons()
 
 	local weapon = {}
 	weapon.Icon = Material("lvs/weapons/mg.png")
-	weapon.Ammo = 1000
+	weapon.Ammo = 500
 	weapon.Delay = 0.1
 	weapon.HeatRateUp = 0.2
 	weapon.HeatRateDown = 0.25
@@ -457,13 +440,12 @@ function ENT:AddGunnerWeapons()
 		local bullet = {}
 		bullet.Src 	= Muzzle.Pos
 		bullet.Dir 	= (ent:GetEyeTrace().HitPos - bullet.Src):GetNormalized()
-		bullet.Spread = Vector(0.01,0.01,0.01)
+		bullet.Spread 	= Vector(0.015,0.015,0.015)
 		bullet.TracerName = "lvs_tracer_yellow_small"
-		bullet.Force	= 10
-		bullet.EnableBallistics = true
+		bullet.Force	= 1
 		bullet.HullSize 	= 0
 		bullet.Damage	= 25
-		bullet.Velocity = 15000
+		bullet.Velocity = 30000
 		bullet.Attacker 	= ent:GetDriver()
 		ent:LVSFireBullet( bullet )
 

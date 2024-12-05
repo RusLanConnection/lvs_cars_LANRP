@@ -21,12 +21,23 @@ function ENT:TakeCollisionDamage( damage, attacker )
 	if not IsValid( Engine ) then return end
 
 	local dmginfo = DamageInfo()
-	dmginfo:SetDamage( damage / 100 )
+	dmginfo:SetDamage( damage / 10)
 	dmginfo:SetAttacker( attacker )
 	dmginfo:SetInflictor( attacker )
 	dmginfo:SetDamageType( DMG_CRUSH + DMG_VEHICLE )
 
+	self:TakeDamageInfo( dmginfo )
 	Engine:TakeTransmittedDamage( dmginfo )
+
+	if IsValid(self:GetDriver()) then
+		self:HurtPlayer( self:GetDriver(), damage / 50, attacker, attacker )
+	end
+	
+	for i = 1, #self:GetPassengerSeats() do
+		if IsValid(self:GetPassenger( i )) then
+			self:HurtPlayer( self:GetPassenger( i ), damage / 50, attacker, attacker )
+		end
+	end
 end
 
 function ENT:Explode()
@@ -140,6 +151,8 @@ function ENT:OnExploded()
 	local PhysObj = self:GetPhysicsObject()
 
 	if not IsValid( PhysObj ) then return end
+
+	util.BlastDamage( self, self, PhysObj:GetPos(), 230, 70 )
 
 	PhysObj:SetVelocity( self:GetVelocity() + Vector(math.random(-5,5),math.random(-5,5),math.random(150,250)) )
 end

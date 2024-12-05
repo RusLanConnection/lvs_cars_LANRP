@@ -448,8 +448,8 @@ function ENT:OnMaintenance()
 	if IsValid( FuelTank ) then
 		FuelTank:ExtinguishAndRepair()
 
-		if FuelTank:GetFuel() ~= 1 then
-			FuelTank:SetFuel( 1 )
+		if FuelTank:GetFuel() ~= FuelTank:GetSize() then
+			FuelTank:SetFuel( FuelTank:GetSize() )
 
 			self:OnRefueled()
 		end

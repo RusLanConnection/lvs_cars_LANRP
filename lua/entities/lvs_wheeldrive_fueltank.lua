@@ -19,7 +19,13 @@ function ENT:SetupDataTables()
 	if SERVER then
 		self:SetMaxHP( 100 )
 		self:SetHP( 100 )
-		self:SetFuel( 1 )
+	
+		timer.Simple(0, function()
+			if IsValid(self) then
+				self:SetFuel( self:GetSize())
+			end
+		end)
+
 		self:NetworkVarNotify( "Fuel", self.OnFuelChanged )
 	end
 end
@@ -53,7 +59,7 @@ if SERVER then
 				dmg:SetDamageType( DMG_BURN )
 				Base:TakeDamageInfo( dmg )
 
-				self:SetFuel( math.max( self:GetFuel() - 0.05, 0 ) )
+				self:SetFuel( (math.Clamp( self:GetFuel() - (self:GetSize() / 100), 0, self:GetSize()) ) )
 			else
 				self:SetDestroyed( false )
 			end
@@ -61,7 +67,8 @@ if SERVER then
 			local base = self:GetBase()
 
 			if IsValid( base ) and base:GetEngineActive() then
-				self:SetFuel( math.max( self:GetFuel() - (1 / self:GetSize()) * base:GetThrottle() ^ 2, 0 ) )
+				self:SetFuel( (math.Clamp( self:GetFuel() - (self:GetSize() / 250), 0, self:GetSize()) ))
+				--print(self:GetFuel())
 			end
 		end
 

@@ -9,6 +9,14 @@ ENT.Category = "[LVS]"
 ENT.Spawnable		= true
 ENT.AdminOnly		= false
 
+ENT.JModEZstorable = true
+ENT.EZstorageVolumeOverride = 5
+
+ENT.RefilBlackList = {
+	["lvs_trailer_schneider"] = true,
+	["lvs_wheeldrive_pz1bison"] = true,
+}
+
 if SERVER then
 	function ENT:SpawnFunction( ply, tr, ClassName )
 		if not tr.Hit then return end
@@ -26,6 +34,13 @@ if SERVER then
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:PhysWake()
 		self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
+		self:SetUseType( SIMPLE_USE )
+	end
+
+	function ENT:Use( activator )
+		if activator:IsPlayerHolding() then return end
+
+		activator:PickupObject( self )
 	end
 
 	function ENT:Think()
@@ -79,7 +94,7 @@ if SERVER then
 		if not entity.LVS then return end
 
 		if self:AddSingleRound( entity ) then
-			entity:OnMaintenance()
+			--entity:OnMaintenance()
 
 			entity:EmitSound("items/ammo_pickup.wav")
 
@@ -113,16 +128,16 @@ if SERVER then
 		end
 
 		self:SetModel("models/misc/88mm_casing.mdl")
+
+		SafeRemoveEntityDelayed(self, 5)
 	end
 
 	function ENT:PhysicsCollide( data, physobj )
-		if data.Speed > 60 and data.DeltaTime > 0.2 then
-			local VelDif = data.OurOldVelocity:Length() - data.OurNewVelocity:Length()
-
-			if VelDif > 700 then
-				self:ShootBullet()
-			end
+		if data.Speed > 50 and data.DeltaTime > 0.2 then
+			self:EmitSound("Canister.ImpactHard")
 		end
+
+		if self.RefilBlackList[data.HitEntity:GetClass()] then return end
 
 		self:Refil( data.HitEntity )
 	end
